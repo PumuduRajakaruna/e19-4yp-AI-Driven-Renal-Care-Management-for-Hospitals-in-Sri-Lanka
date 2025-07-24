@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { HeadingLarge, HeadingMedium } from 'baseui/typography';
+import React, { useState, useEffect, MouseEvent } from 'react';
+import { HeadingLarge, HeadingMedium, LabelMedium, LabelSmall } from 'baseui/typography';
 import { Card, StyledBody } from 'baseui/card';
 import { Grid, Cell } from 'baseui/layout-grid';
 import { Block } from 'baseui/block';
@@ -112,41 +112,129 @@ const NurseDashboard: React.FC = () => {
                   No patients available
                 </Block>
               ) : (
-                recentPatients.map(patient => (
-                  <Block
-                    key={patient.id || patient.patientId}
-                    marginBottom="16px"
-                    padding="16px"
-                    backgroundColor="rgba(0, 0, 0, 0.03)"
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Block>
-                      <Block font="font500">{patient.name}</Block>
-                      <Block color="primary400" font="font300">
-                        Age: {patient.age}, Gender: {patient.gender}
-                      </Block>
-                      <Block color="primary400" font="font300">
-                        Blood Type: {patient.bloodType}
-                      </Block>
-                      <Block color="primary400" font="font300">
-                        Doctor: {typeof patient.assignedDoctor === 'string' ? 
-                          patient.assignedDoctor : 
-                          patient.assignedDoctor?.name || 'Not assigned'}
-                      </Block>
-                    </Block>
-                    <Button
-                      onClick={() => handlePatientClick(patient.id || patient.patientId || '')}
-                      size="compact"
-                    >
-                      View
-                    </Button>
-                  </Block>
-                ))
+                recentPatients.map(patient => <Block
+  key={patient.id || patient.patientId}
+  marginBottom="scale600"
+  padding="scale700"
+  backgroundColor="mono100"
+  display="flex"
+  justifyContent="space-between"
+  alignItems="center"
+  overrides={{
+    Block: {
+      style: {
+        borderRadius: '8px',
+        borderLeft: '4px solid #276EF1',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+        transition: 'all 0.2s ease',
+        ':hover': {
+          backgroundColor: 'mono200'
+        }
+      }
+    }
+  }}
+>
+  <Block>
+    <LabelMedium 
+      marginBottom="scale300"
+      font="font550"
+      color="contentPrimary"
+    >
+      {patient.name}
+    </LabelMedium>
+    
+    <Block display="flex" flexWrap={true} marginBottom="scale200">
+      <Block 
+        display="flex" 
+        alignItems="center" 
+        marginRight="scale600"
+        color="contentSecondary"
+        font="font300"
+      >
+        <Block marginRight="scale200">Age:</Block>
+        <Block font="font400" color="contentPrimary">{patient.age}</Block>
+        <Block marginLeft="scale400" marginRight="scale200">Gender:</Block>
+        <Block font="font400" color="contentPrimary">{patient.gender}</Block>
+      </Block>
+    </Block>
+    
+    <Block 
+      display="flex" 
+      alignItems="center"
+      marginBottom="scale200"
+      color="contentSecondary"
+      font="font300"
+    >
+      <Block marginRight="scale200">Blood Type:</Block>
+      <Block 
+        font="font400" 
+        color="contentPrimary"
+        overrides={{
+          Block: {
+            style: {
+              textTransform: 'uppercase'
+            }
+          }
+        }}
+      >
+        {patient.bloodType}
+      </Block>
+    </Block>
+    
+    <Block 
+      display="flex" 
+      alignItems="center"
+      color="contentSecondary"
+      font="font300"
+    >
+      <Block marginRight="scale200">Doctor:</Block>
+      <Block font="font400" color="contentPrimary">
+        {typeof patient.assignedDoctor === 'string' ? 
+          patient.assignedDoctor : 
+          patient.assignedDoctor?.name || 'Not assigned'}
+      </Block>
+    </Block>
+  </Block>
+  
+  <Button
+    onClick={() => handlePatientClick(patient.patientId || patient.id || '')}
+    size="compact"
+    kind="secondary"
+    overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}
+  >
+    View
+  </Button>
+</Block>)
               )}
               <Block display="flex" justifyContent="center" marginTop="16px">
-                <Button onClick={() => navigate('/nurse/patients')}>
+                <Button onClick={() => navigate('/nurse/patients')}
+                   overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>
                   View All Patients
                 </Button>
               </Block>
@@ -157,16 +245,72 @@ const NurseDashboard: React.FC = () => {
             <StyledBody>
               <HeadingMedium>Quick Actions</HeadingMedium>
               <Block display="flex" flexWrap={true} style={{ gap: '16px' }}>
-                <Button onClick={() => navigate('/nurse/patients')}>
+                <Button onClick={() => navigate('/nurse/patients')}
+                   overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>
                   Search Patients
                 </Button>
-                <Button onClick={() => navigate('/nurse/submission-status')}>
+                <Button onClick={() => navigate('/nurse/submission-status')}
+                   overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>
                   View Submissions
                 </Button>
-                <Button onClick={() => navigate('/nurse/notifications')}>
+                <Button onClick={() => navigate('/nurse/notifications')}
+                   overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>
                   All Notifications
                 </Button>
-                <Button onClick={() => navigate('/nurse/add-patient')}>
+                <Button onClick={() => navigate('/nurse/add-patient')}
+                   overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>
                   Add New Patient
                 </Button>
               </Block>
@@ -183,33 +327,113 @@ const NurseDashboard: React.FC = () => {
                   No new notifications
                 </Block>
               ) : (
-                notifications.map(notification => (
-                  <Block
-                    key={notification.id}
-                    marginBottom="16px"
-                    padding="16px"
-                    backgroundColor={
-                      notification.type === 'critical' || notification.priority === 'high'
-                        ? 'rgba(255, 0, 0, 0.1)'
-                        : notification.type === 'warning' || notification.priority === 'medium'
-                          ? 'rgba(255, 165, 0, 0.1)'
-                          : 'rgba(0, 0, 0, 0.03)'
-                    }
-                    style={{
-                      border: notification.read ? 'none' : '2px solid rgba(0, 0, 0, 0.1)',
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => handleNotificationClick(notification)}
-                  >
-                    <Block font="font500">{notification.title}</Block>
-                    <Block font="font300">{notification.message}</Block>
-                    <Block color="primary400" font="font300" marginTop="8px">
-                      {notification.date ? new Date(notification.date).toLocaleString() : 
-                       notification.createdAt ? new Date(notification.createdAt).toLocaleString() : 
-                       'No date available'}
-                    </Block>
-                  </Block>
-                ))
+                notifications.map(notification => <Block
+  key={notification.id}
+  marginBottom="scale600"
+  padding="scale700"
+  backgroundColor={
+    notification.type === 'critical' || notification.priority === 'high'
+      ? 'rgba(255, 0, 0, 0.05)'
+      : notification.type === 'warning' || notification.priority === 'medium'
+        ? 'rgba(255, 165, 0, 0.05)'
+        : 'rgba(0, 0, 0, 0.02)'
+  }
+  overrides={{
+    Block: {
+      style: {
+        borderRadius: '8px',
+        borderLeft: notification.type === 'critical' || notification.priority === 'high'
+          ? '4px solid #FF0000'
+          : notification.type === 'warning' || notification.priority === 'medium'
+            ? '4px solid #FFA500'
+            : '4px solid #276EF1',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        boxShadow: notification.read ? 'none' : '0 1px 2px rgba(0,0,0,0.05)',
+        border: notification.read ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        ':hover': {
+          backgroundColor: notification.type === 'critical' || notification.priority === 'high'
+            ? 'rgba(255, 0, 0, 0.08)'
+            : notification.type === 'warning' || notification.priority === 'medium'
+              ? 'rgba(255, 165, 0, 0.08)'
+              : 'rgba(0, 0, 0, 0.04)'
+        }
+      }
+    }
+  }}
+  onClick={() => handleNotificationClick(notification)}
+>
+  <LabelMedium
+    marginBottom="scale300"
+    font="font550"
+    color={
+      notification.type === 'critical' || notification.priority === 'high'
+        ? '#FF0000'
+        : notification.type === 'warning' || notification.priority === 'medium'
+          ? '#FFA500'
+          : 'contentPrimary'
+    }
+  >
+    {notification.title}
+  </LabelMedium>
+  
+  <Block
+    font="font400"
+    marginBottom="scale400"
+    color="contentSecondary"
+  >
+    {notification.message}
+  </Block>
+  
+  <LabelSmall
+    color="contentTertiary"
+    font="font300"
+  >
+    {notification.date ? new Date(notification.date).toLocaleString() : 
+     notification.createdAt ? new Date(notification.createdAt).toLocaleString() : 
+     'No date available'}
+  </LabelSmall>
+  
+  {!notification.read && (
+    <Block
+      marginTop="scale300"
+      display="flex"
+      alignItems="center"
+    >
+      <Block
+        width="8px"
+        height="8px"
+        backgroundColor={
+          notification.type === 'critical' || notification.priority === 'high'
+            ? '#FF0000'
+            : notification.type === 'warning' || notification.priority === 'medium'
+              ? '#FFA500'
+              : '#276EF1'
+        }
+        marginRight="scale200"
+        overrides={{
+          Block: {
+            style: {
+              borderRadius: '50%'
+            }
+          }
+        }}
+      />
+      <LabelSmall
+        color={
+          notification.type === 'critical' || notification.priority === 'high'
+            ? 'negative'
+            : notification.type === 'warning' || notification.priority === 'medium'
+              ? 'warning'
+              : 'primary'
+        }
+        font="font300"
+      >
+        Unread
+      </LabelSmall>
+    </Block>
+  )}
+</Block>)
               )}
             </StyledBody>
           </Card>

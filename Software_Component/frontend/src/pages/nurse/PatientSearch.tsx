@@ -68,58 +68,135 @@ const NursePatientSearch: React.FC = () => {
   }
 
   return (
-    <Block>
-      <HeadingLarge>Patient Search</HeadingLarge>
+  <Block>
+    <HeadingLarge>Patient Search</HeadingLarge>
 
-      <Grid gridMargins={[16, 32]} gridGutters={[16, 32]} gridMaxWidth={1200}>
-        <Cell span={12}>
-          <Card
-            overrides={{
-              Root: {
-                style: {
-                  marginBottom: '20px'
-                }
+    <Grid gridMargins={[16, 32]} gridGutters={[16, 32]} gridMaxWidth={1200}>
+      <Cell span={12}>
+        <Card
+          overrides={{
+            Root: {
+              style: {
+                marginBottom: '20px'
               }
-            }}
-          >
-            <StyledBody>
-              <Block display="flex" justifyContent="space-between" alignItems="flex-end" marginBottom="16px">
-                <FormControl label="Search Patients">
-                  <Input
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.currentTarget.value)}
-                    placeholder="Search by Patient ID or Name"
-                    clearable
-                    clearOnEscape
-                  />
-                </FormControl>
-                <Button onClick={handleAddNewPatient}>Add New Patient</Button>
+            }
+          }}
+        >
+          <StyledBody>
+            <Block 
+              display="flex" 
+              alignItems="center" 
+              marginBottom="8px"
+              overrides={{
+                Block: {
+                  style: {
+                    gap: '16px' // Adds consistent spacing between items
+                  }
+                }
+              }}
+            >
+              <Block flex="1"> {/* Takes remaining space */}
+                <FormControl 
+  label="Search Patients"
+  overrides={{
+    Label: {
+      style: {
+        fontSize: '26px',  // Increased from default 14px
+        lineHeight: '20px', // Adjust line height to match
+        paddingBottom: '8px' // Maintain proper spacing
+      }
+    }
+  }}
+>
+  <Input
+    value={searchTerm}
+    onChange={e => setSearchTerm(e.currentTarget.value)}
+    placeholder="Search by Patient ID or Name"
+    clearable
+    clearOnEscape
+    overrides={{
+      Input: {
+        style: {
+          height: '48px' // Matches button height
+        }
+      },
+      InputContainer: {
+        style: {
+          marginBottom: 0 // Removes default margin
+        }
+      }
+    }}
+  />
+</FormControl>
               </Block>
+              
+              <Button 
+                onClick={handleAddNewPatient}
+                overrides={{
+                  BaseButton: {
+                    style: {
+                      backgroundColor: '#276EF1',
+                      color: '#FFF',
+                      width: '200px',
+                      height: '48px',
+                      minWidth: '200px',
+                      minHeight: '48px',
+                      marginTop: '24px', // Aligns with input field
+                      ':hover': {
+                        backgroundColor: '#1A54C8' // Slightly darker on hover
+                      },
+                      ':active': {
+                        backgroundColor: '#143FA6' // Even darker on active
+                      }
+                    }
+                  }
+                }}
+              >
+                Add New Patient
+              </Button>
+            </Block>
 
-              <Table
-                columns={['ID', 'Name', 'Age', 'Gender', 'Blood Type', 'Contact Number', 'Assigned Doctor', 'Actions']}
-                data={filteredPatients.map(patient => {
-                  // console.log('Patient:', patient)
-                  return [
-                    patient.patientId,
-                    patient.name,
-                    patient.age,
-                    patient.gender,
-                    patient.bloodType,
-                    patient.contactNumber,
-                    patient.assignedDoctor?.name || "N/A",
-                    <Button key={patient.id} onClick={() => handleViewPatient(patient.id)} size="compact">
-                      View
-                    </Button>
-                  ]
-                })}
-              />
-            </StyledBody>
-          </Card>
-        </Cell>
-      </Grid>
-    </Block>
-  )
+            <Table
+              columns={['ID', 'Name', 'Age', 'Gender', 'Blood Type', 'Contact Number', 'Assigned Doctor', 'Actions']}
+              data={filteredPatients.map(patient => {
+                return [
+                  patient.patientId,
+                  patient.name,
+                  patient.age,
+                  patient.gender,
+                  patient.bloodType,
+                  patient.contactNumber,
+                  patient.assignedDoctor?.name || "N/A",
+                  <Button 
+                    key={patient.id} 
+                    onClick={() => handleViewPatient(patient.id)} 
+                    size="compact"
+                    overrides={{
+                      BaseButton: {
+                        style: {
+                          backgroundColor: '#276EF1',
+                          color: '#FFF',
+                          ':hover': {
+                            backgroundColor: '#1A54C8'
+                          },
+                          ':active': {
+                            backgroundColor: '#143FA6'
+                          }
+                        }
+                      }
+                    }}
+                  >
+                    View
+                  </Button>
+                ]
+              })}
+            />
+          </StyledBody>
+        </Card>
+      </Cell>
+    </Grid>
+  </Block>
+)
 }
 
 export default NursePatientSearch

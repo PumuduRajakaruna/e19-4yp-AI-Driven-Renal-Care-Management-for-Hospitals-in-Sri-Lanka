@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HeadingLarge, HeadingMedium } from 'baseui/typography';
+import { HeadingLarge, HeadingMedium, LabelMedium, LabelSmall } from 'baseui/typography';
 import { Card, StyledBody } from 'baseui/card';
 import { Grid, Cell } from 'baseui/layout-grid';
 import { Block } from 'baseui/block';
@@ -124,39 +124,123 @@ const DoctorDashboard: React.FC = () => {
                 </Block>
               ) : recentPatients.length > 0 ? (
                 recentPatients.map(patient => (
-                  <Block
-                    key={patient.id}
-                    marginBottom="16px"
-                    padding="16px"
-                    backgroundColor="rgba(255, 165, 0, 0.1)"
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Block>
-                      <Block font="font500">{patient.name}</Block>
-                      <Block color="primary400" font="font300">
-                        Patient ID: {patient.patientId || patient.id}
-                      </Block>
-                      <Block color="primary400" font="font300">
-                        Registered: {'25/04/2025'}
-                      </Block>
-                      <Block color="warning" font="font300">
-                        Recently added - requires review
-                      </Block>
-                    </Block>
-                    <Button onClick={() => handlePatientClick(patient.patientId || patient.id)} size="compact">
-                      Review
-                    </Button>
-                  </Block>
-                ))
+  <Block
+    key={patient.id}
+    marginBottom="scale600"
+    padding="scale600"
+    backgroundColor="mono100"
+    display="flex"
+    justifyContent="space-between"
+    alignItems="center"
+    overrides={{
+      Block: {
+        style: {
+          borderRadius: '8px',
+          borderLeft: '4px solid #276EF1',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
+          transition: 'all 0.2s ease',
+          ':hover': {
+            backgroundColor: 'mono200'
+          }
+        }
+      }
+    }}
+  >
+    <Block>
+      <LabelMedium marginBottom="scale200" font="font550">
+        {patient.name}
+      </LabelMedium>
+      <Block display="flex" flexWrap={true} marginBottom="scale200">
+        <Block 
+          display="flex" 
+          alignItems="center" 
+          marginRight="scale600"
+          color="contentSecondary"
+          font="font300"
+        >
+          <Block marginRight="scale200">Patient ID:</Block>
+          <Block font="font400" color="contentPrimary">
+            {patient.patientId || patient.id}
+          </Block>
+        </Block>
+        <Block 
+          display="flex" 
+          alignItems="center"
+          color="contentSecondary"
+          font="font300"
+        >
+          <Block marginRight="scale200">Registered:</Block>
+          <Block font="font400" color="contentPrimary">
+            {new Date(patient.registrationDate).toLocaleDateString()}
+          </Block>
+        </Block>
+      </Block>
+      <Block 
+        display="flex" 
+        alignItems="center"
+        color="warning"
+        font="font300"
+      >
+        <Block 
+          width="8px" 
+          height="8px" 
+          backgroundColor="warning" 
+          marginRight="scale300"
+          overrides={{
+            Block: {
+              style: {
+                borderRadius: '50%'
+              }
+            }
+          }}
+        />
+        Recently added - requires review
+      </Block>
+    </Block>
+    <Button 
+      onClick={() => handlePatientClick(patient.patientId || patient.id)} 
+      size="compact"
+      kind="secondary"
+      overrides={{
+        BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+      }}
+    >
+      Review
+    </Button>
+  </Block>
+))
               ) : (
                 <Block padding="16px" font="font300">
                   No recent patients found
                 </Block>
               )}
               <Block display="flex" justifyContent="center" marginTop="16px">
-                <Button onClick={() => navigate('/doctor/patients')}>
+                <Button onClick={() => navigate('/doctor/patients')}
+                  overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>
                   View All Patients
                 </Button>
               </Block>
@@ -171,8 +255,36 @@ const DoctorDashboard: React.FC = () => {
                 flexWrap={true}
                 style={{ gap: '16px' }}
               >
-                <Button onClick={() => navigate('/doctor/patients')}>Search Patients</Button>
-                <Button onClick={() => navigate('/doctor/notifications')}>
+                <Button onClick={() => navigate('/doctor/patients')}
+                  overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>Search Patients</Button>
+                <Button onClick={() => navigate('/doctor/notifications')}
+                  overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>
                   All Notifications
                 </Button>
               </Block>
@@ -198,68 +310,164 @@ const DoctorDashboard: React.FC = () => {
                 </Block>
               ) : (
                 notifications.map(notification => {
-                  // Get the first recipient's read status (assuming current user is first recipient)
-                  const isRead = notification.recipients && notification.recipients.length > 0 
-                    ? notification.recipients[0].read 
-                    : false;
-                  
-                  // Map notification type to background color
-                  const getBackgroundColor = (type: string, priority: string) => {
-                    if (type === 'WARNING' || priority === 'HIGH') {
-                      return 'rgba(255, 0, 0, 0.1)';
-                    } else if (type === 'INFO' && priority === 'MEDIUM') {
-                      return 'rgba(255, 165, 0, 0.1)';
-                    } else {
-                      return 'rgba(0, 0, 0, 0.03)';
-                    }
-                  };
+  // Get the first recipient's read status (assuming current user is first recipient)
+  const isRead = notification.recipients && notification.recipients.length > 0 
+    ? notification.recipients[0].read 
+    : false;
+  
+  // Map notification type to background color
+  const getBackgroundColor = (type: string, priority: string) => {
+    if (type === 'WARNING' || priority === 'HIGH') {
+      return 'rgba(255, 0, 0, 0.05)';
+    } else if (type === 'INFO' && priority === 'MEDIUM') {
+      return 'rgba(255, 165, 0, 0.05)';
+    } else {
+      return 'rgba(0, 0, 0, 0.02)';
+    }
+  };
 
-                  return (
-                    <Block
-                      key={notification.id}
-                      marginBottom="16px"
-                      padding="16px"
-                      backgroundColor={getBackgroundColor(notification.type, notification.priority)}
-                      style={{
-                        border: isRead ? 'none' : '2px solid rgba(0, 0, 0, 0.1)',
-                        cursor: 'pointer',
-                      }}
-                      onClick={() => handleNotificationClick(notification)}
-                    >
-                      <Block display="flex" justifyContent="space-between" marginBottom="4px">
-                        <Block font="font500">{notification.title}</Block>
-                        <Block font="font300" color="primary400">
-                          {notification.priority}
-                        </Block>
-                      </Block>
-                      <Block font="font300" marginBottom="8px">
-                        {notification.message}
-                      </Block>
-                      <Block display="flex" justifyContent="space-between" alignItems="center">
-                        <Block color="primary400" font="font300">
-                          {new Date(notification.createdAt).toLocaleString()}
-                        </Block>
-                        <Block font="font300" color="primary500">
-                          {notification.category}
-                        </Block>
-                      </Block>
-                      {!isRead && (
-                        <Block 
-                          marginTop="8px" 
-                          font="font300" 
-                          color="warning"
-                          display="flex"
-                          alignItems="center"
-                        >
-                          • Unread
-                        </Block>
-                      )}
-                    </Block>
-                  );
+  return (
+    <Block
+      key={notification.id}
+      marginBottom="scale500"
+      padding="scale600"
+      backgroundColor={getBackgroundColor(notification.type, notification.priority)}
+      overrides={{
+        Block: {
+          style: {
+            borderRadius: '8px',
+            borderLeft: notification.type === 'WARNING' || notification.priority === 'HIGH' 
+              ? '4px solid #FF0000' 
+              : notification.type === 'INFO' && notification.priority === 'MEDIUM'
+              ? '4px solid #FFA500'
+              : '4px solid #276EF1',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            boxShadow: isRead ? 'none' : '0 1px 2px rgba(0,0,0,0.05)',
+            ':hover': {
+              backgroundColor: isRead 
+                ? getBackgroundColor(notification.type, notification.priority)
+                : notification.type === 'WARNING' || notification.priority === 'HIGH'
+                ? 'rgba(255, 0, 0, 0.08)'
+                : notification.type === 'INFO' && notification.priority === 'MEDIUM'
+                ? 'rgba(255, 165, 0, 0.08)'
+                : 'rgba(0, 0, 0, 0.04)'
+            }
+          }
+        }
+      }}
+      onClick={() => handleNotificationClick(notification)}
+    >
+      <Block display="flex" justifyContent="space-between" marginBottom="scale300">
+        <LabelMedium 
+          font="font550"
+          overrides={{
+            Block: {
+              style: {
+                color: notification.type === 'WARNING' || notification.priority === 'HIGH'
+                  ? '#FF0000'
+                  : notification.type === 'INFO' && notification.priority === 'MEDIUM'
+                  ? '#FFA500'
+                  : 'inherit'
+              }
+            }
+          }}
+        >
+          {notification.title}
+        </LabelMedium>
+        <LabelSmall 
+          color={notification.priority === 'HIGH' 
+            ? 'negative' 
+            : notification.priority === 'MEDIUM' 
+            ? 'warning' 
+            : 'positive'}
+          font="font400"
+          overrides={{
+            Block: {
+              style: {
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }
+            }
+          }}
+        >
+          {notification.priority}
+        </LabelSmall>
+      </Block>
+      
+      <Block 
+        font="font400" 
+        marginBottom="scale400"
+        color="contentSecondary"
+      >
+        {notification.message}
+      </Block>
+      
+      <Block display="flex" justifyContent="space-between" alignItems="center">
+        <LabelSmall color="contentTertiary" font="font300">
+          {new Date(notification.createdAt).toLocaleString()}
+        </LabelSmall>
+        <LabelSmall 
+          color="primary" 
+          font="font400"
+          overrides={{
+            Block: {
+              style: {
+                backgroundColor: 'rgba(39, 110, 241, 0.1)',
+                padding: '2px 8px',
+                borderRadius: '4px'
+              }
+            }
+          }}
+        >
+          {notification.category}
+        </LabelSmall>
+      </Block>
+      
+      {!isRead && (
+        <Block 
+          marginTop="scale300" 
+          font="font300" 
+          color="warning"
+          display="flex"
+          alignItems="center"
+        >
+          <Block 
+            width="8px" 
+            height="8px" 
+            backgroundColor="warning" 
+            marginRight="scale200"
+            overrides={{
+              Block: {
+                style: {
+                  borderRadius: '50%'
+                }
+              }
+            }}
+          />
+          Unread
+        </Block>
+      )}
+    </Block>
+  );
                 })
               )}
               <Block display="flex" justifyContent="center" marginTop="16px">
-                <Button onClick={() => navigate('/doctor/notifications')}>
+                <Button onClick={() => navigate('/doctor/notifications')}
+                  overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>
                   View All Notifications
                 </Button>
               </Block>

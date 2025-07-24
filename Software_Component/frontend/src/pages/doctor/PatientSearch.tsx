@@ -63,17 +63,28 @@ const DoctorPatientSearch: React.FC = () => {
         <Cell span={12}>
           <Card overrides={{ Root: { style: { marginBottom: '20px' } } }}>
             <StyledBody>
-              <Block display="flex" justifyContent="space-between" alignItems="flex-end" marginBottom="16px">
-                <FormControl label="Search Patients">
-                  <Input
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.currentTarget.value)}
-                    placeholder="Search by Patient ID, Name, Doctor, Blood Type, or Gender"
-                    clearable
-                    clearOnEscape
-                    disabled={loading}
-                  />
-                </FormControl>
+              <Block display="flex" alignItems="flex-end" marginBottom="16px">
+                <Block flex="1" marginRight="8px">
+                  <FormControl label="Search Patients">
+                    <Input
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.currentTarget.value)}
+                      placeholder="Search by Patient ID, Name, Doctor, Blood Type, or Gender"
+                      clearable
+                      clearOnEscape
+                      disabled={loading}
+                      overrides={{
+                        Input: {
+                          style: {
+                            borderTopRightRadius: '0',
+                            borderBottomRightRadius: '0'
+                          }
+                        }
+                      }}
+                    />
+                  </FormControl>
+                </Block>
+                  
               </Block>
 
               {loading ? (
@@ -94,7 +105,21 @@ const DoctorPatientSearch: React.FC = () => {
                     patient.gender,
                     patient.bloodType,
                     getAssignedDoctorName(patient.assignedDoctor),
-                    <Button key={patient.id} size="compact" onClick={() => handleViewPatient(patient.patientId ?? patient.id)}>
+                    <Button key={patient.id} size="compact" onClick={() => handleViewPatient(patient.patientId ?? patient.id)}
+                     overrides={{
+                      BaseButton: {
+                        style: {
+                          backgroundColor: '#276EF1',
+                          color: '#FFF',
+                          ':hover': {
+                            backgroundColor: '#1A54C8'
+                          },
+                          ':active': {
+                            backgroundColor: '#143FA6'
+                          }
+                        }
+                      }
+                    }}>
                       View
                     </Button>,
                   ])}

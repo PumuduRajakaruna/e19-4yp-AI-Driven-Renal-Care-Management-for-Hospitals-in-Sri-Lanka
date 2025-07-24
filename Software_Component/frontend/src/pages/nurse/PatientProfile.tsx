@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { HeadingLarge, HeadingMedium, HeadingSmall } from 'baseui/typography';
+import { HeadingLarge, HeadingMedium, HeadingSmall, LabelMedium, LabelSmall } from 'baseui/typography';
 import { Card, StyledBody } from 'baseui/card';
 import { Grid, Cell } from 'baseui/layout-grid';
 import { Block } from 'baseui/block';
@@ -11,6 +11,7 @@ import { Patient } from '../../types';
 import { fetchPatientById, fetchMonthlyInvestigations, fetchDialysisSessions } from '../doctor/PatientService';
 
 const NursePatientProfile: React.FC = () => {
+  
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [activeKey, setActiveKey] = useState<string | number>('0');
@@ -36,7 +37,7 @@ const NursePatientProfile: React.FC = () => {
     if (!id) return;
     
     try {
-      const patientData = await fetchPatientById("RHD_THP_003");
+      const patientData = await fetchPatientById('RHD_THP_003'); // Replace with id when available
       setPatient(patientData);
     } catch (error) {
       console.error('Error loading patient data:', error);
@@ -63,6 +64,8 @@ const NursePatientProfile: React.FC = () => {
     }
   };
 
+
+
   // Load dialysis sessions
   const loadDialysisSessions = async (patientId: string) => {
     try {
@@ -83,6 +86,15 @@ const NursePatientProfile: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (patient && patient.patientId) {
+      // Load monthly investigations when the patient data is available
+      loadMonthlyInvestigations(patient.patientId);
+      // Load dialysis sessions when the patient data is available
+      loadDialysisSessions(patient.patientId);
+    } 
+  }, [patient]);
+
   function getFormattedMedicalHistory(medicalHistory: string | { renalDiagnosis: string; medicalProblems: Array<{ problem: string; diagnosedDate: string; status: string; }>; allergies: any[]; medications: any[]; }): React.ReactNode {
     if (typeof medicalHistory === 'string') {
       return medicalHistory;
@@ -92,14 +104,15 @@ const NursePatientProfile: React.FC = () => {
       return (
         <Block>
           {medicalHistory.renalDiagnosis && (
-            <Block marginBottom="8px">
-              <strong>Renal Diagnosis:</strong> {medicalHistory.renalDiagnosis}
+            <Block marginBottom="12px">
+              <LabelMedium marginBottom="4px">Renal Diagnosis:</LabelMedium>
+              <Block font="font400">{medicalHistory.renalDiagnosis}</Block>
             </Block>
           )}
           
           {medicalHistory.medicalProblems && medicalHistory.medicalProblems.length > 0 && (
-            <Block marginBottom="8px">
-              <strong>Medical Problems:</strong>
+            <Block marginBottom="12px">
+              <LabelMedium marginBottom="4px">Medical Problems:</LabelMedium>
               {medicalHistory.medicalProblems.map((problem, index) => (
                 <Block key={index} marginLeft="16px" marginTop="4px">
                   • {problem.problem} (Diagnosed: {problem.diagnosedDate}, Status: {problem.status})
@@ -109,14 +122,15 @@ const NursePatientProfile: React.FC = () => {
           )}
           
           {medicalHistory.allergies && medicalHistory.allergies.length > 0 && (
-            <Block marginBottom="8px">
-              <strong>Allergies:</strong> {medicalHistory.allergies.join(', ')}
+            <Block marginBottom="12px">
+              <LabelMedium marginBottom="4px">Allergies:</LabelMedium>
+              <Block font="font400">{medicalHistory.allergies.join(', ')}</Block>
             </Block>
           )}
           
           {medicalHistory.medications && medicalHistory.medications.length > 0 && (
-            <Block marginBottom="8px">
-              <strong>Current Medications:</strong>
+            <Block marginBottom="12px">
+              <LabelMedium marginBottom="4px">Current Medications:</LabelMedium>
               {medicalHistory.medications.map((medication: any, index: number) => (
                 <Block key={index} marginLeft="16px" marginTop="4px">
                   • {medication.name} - {medication.dosage} ({medication.frequency})
@@ -157,24 +171,24 @@ const NursePatientProfile: React.FC = () => {
 
   if (!patient) {
     return (
-      <Block>
+      <Block display="flex" justifyContent="center" alignItems="center" height="100vh">
         <HeadingLarge>Loading Patient Profile...</HeadingLarge>
       </Block>
     );
   }
 
   return (
-    <Block>
-      <HeadingLarge>Patient Profile</HeadingLarge>
+    <Block padding="scale800">
+      <HeadingLarge marginBottom="scale800">Patient Profile</HeadingLarge>
       
-      <Grid gridMargins={[16, 32]} gridGutters={[16, 32]} gridMaxWidth={1200}>
-        <Cell span={[4, 8, 4]}>
-          <Card>
+      <Grid gridMargins={0} gridGutters={16} gridMaxWidth={1200}>
+        <Cell span={[4, 4, 4]}>
+          <Card overrides={{ Root: { style: { borderRadius: '12px', marginBottom: '24px' } } }}>
             <StyledBody>
-              <Block display="flex" flexDirection="column" alignItems="center" marginBottom="16px">
+              <Block display="flex" flexDirection="column" alignItems="center" marginBottom="scale800">
                 <Block
-                  width="100px"
-                  height="100px"
+                  width="120px"
+                  height="120px"
                   backgroundColor="primary200"
                   display="flex"
                   alignItems="center"
@@ -182,103 +196,249 @@ const NursePatientProfile: React.FC = () => {
                   overrides={{
                     Block: {
                       style: {
-                        borderRadius: '50%'
+                        borderRadius: '50%',
+                        fontSize: '48px',
+                        fontWeight: 600,
+                        color: 'primary'
                       }
                     }
                   }}
-                  marginBottom="16px"
+                  marginBottom="scale600"
                 >
-                  <HeadingLarge marginTop="0" marginBottom="0">
-                    {patient.name.charAt(0)}
-                  </HeadingLarge>
+                  {patient.name.charAt(0).toUpperCase()}
                 </Block>
-                <HeadingMedium marginTop="0" marginBottom="8px">
+                <HeadingMedium marginTop="0" marginBottom="scale300">
                   {patient.name}
                 </HeadingMedium>
-                <Block font="font400" marginBottom="8px">
+                <LabelSmall marginBottom="scale600">
                   ID: {patient.patientId || patient.id}
-                </Block>
+                </LabelSmall>
               </Block>
 
               <Block>
-                <Block display="flex" justifyContent="space-between" marginBottom="8px">
-                  <Block font="font400">Age:</Block>
-                  <Block font="font500">{patient.age}</Block>
-                </Block>
-                <Block display="flex" justifyContent="space-between" marginBottom="8px">
-                  <Block font="font400">Gender:</Block>
-                  <Block font="font500">{patient.gender}</Block>
-                </Block>
-                <Block display="flex" justifyContent="space-between" marginBottom="8px">
-                  <Block font="font400">Blood Type:</Block>
-                  <Block font="font500">{patient.bloodType}</Block>
-                </Block>
-                <Block display="flex" justifyContent="space-between" marginBottom="8px">
-                  <Block font="font400">Contact:</Block>
-                  <Block font="font500">{patient.contactNumber}</Block>
-                </Block>
-                <Block display="flex" justifyContent="space-between" marginBottom="8px">
-                  <Block font="font400">Emergency Contact:</Block>
-                  <Block font="font500">{getFormattedEmergencyContact(patient.emergencyContact)}</Block>
-                </Block>
-                <Block display="flex" justifyContent="space-between" marginBottom="8px">
-                  <Block font="font400">Assigned Doctor:</Block>
-                  <Block font="font500">
-                    {typeof patient.assignedDoctor === 'string' ? 
-                      patient.assignedDoctor : 
-                      patient.assignedDoctor?.name || 'Not assigned'}
-                  </Block>
-                </Block>
-                <Block display="flex" justifyContent="space-between" marginBottom="8px">
-                  <Block font="font400">Registration Date:</Block>
-                  <Block font="font500">{new Date(patient.registrationDate).toLocaleDateString()}</Block>
-                </Block>
-              </Block>
+  {/* Personal Information Section */}
+  <Block marginBottom="scale800">
+    <LabelMedium 
+      marginBottom="scale500"
+      overrides={{
+        Block: {
+          style: {
+            fontSize: '14px',
+            fontWeight: 500,
+            color: 'contentSecondary',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }
+        }
+      }}
+    >
+      Personal Information
+    </LabelMedium>
+    
+    <Block
+      padding="scale600"
+      backgroundColor="mono100"
+      overrides={{
+        Block: {
+          style: {
+            borderRadius: '8px'
+          }
+        }
+      }}
+    >
+      {[
+        { label: 'Age', value: patient.age },
+        { label: 'Gender', value: patient.gender },
+        { label: 'Blood Type', value: patient.bloodType },
+        { label: 'Contact', value: patient.contactNumber },
+        { 
+          label: 'Emergency Contact', 
+          value: getFormattedEmergencyContact(patient.emergencyContact),
+          wide: true 
+        },
+        { 
+          label: 'Assigned Doctor', 
+          value: typeof patient.assignedDoctor === 'string' ? 
+            patient.assignedDoctor : 
+            patient.assignedDoctor?.name || 'Not assigned' 
+        },
+        { 
+          label: 'Registration Date', 
+          value: new Date(patient.registrationDate).toLocaleDateString() 
+        }
+      ].map((item, index) => (
+        <Block 
+          key={index}
+          display="flex"
+          justifyContent="space-between"
+          marginBottom="scale500"
+          alignItems="center"
+        >
+          <LabelSmall color="contentSecondary">{item.label}:</LabelSmall>
+          <Block 
+            font="font500" 
+            color="contentPrimary"
+            width={item.wide ? '60%' : 'auto'}
+            overrides={{
+              Block: {
+                style: {
+                  textAlign: item.wide ? 'right' : 'left',
+                  wordBreak: 'break-word'
+                }
+              }
+            }}
+          >
+            {item.value}
+          </Block>
+        </Block>
+      ))}
+    </Block>
+  </Block>
 
-              <Block marginTop="16px">
-                <HeadingSmall marginTop="0" marginBottom="8px">
-                  Address
-                </HeadingSmall>
-                <Block font="font400">{getFormattedAddress(patient.address)}</Block>
-              </Block>
+  {/* Address Section */}
+  <Block marginBottom="scale800">
+    <LabelMedium 
+      marginBottom="scale500"
+      overrides={{
+        Block: {
+          style: {
+            fontSize: '14px',
+            fontWeight: 500,
+            color: 'contentSecondary',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }
+        }
+      }}
+    >
+      Address
+    </LabelMedium>
+    <Block
+      padding="scale600"
+      backgroundColor="mono100"
+      font="font400"
+      color="contentPrimary"
+      overrides={{
+        Block: {
+          style: {
+            borderRadius: '8px',
+            whiteSpace: 'pre-line'
+          }
+        }
+      }}
+    >
+      {getFormattedAddress(patient.address)}
+    </Block>
+  </Block>
 
-              <Block marginTop="16px">
-                <HeadingSmall marginTop="0" marginBottom="8px">
-                  Medical History
-                </HeadingSmall>
-                <Block font="font400" whiteSpace="pre-line">{getFormattedMedicalHistory(patient.medicalHistory)}</Block>
-              </Block>
+  {/* Medical History Section */}
+  <Block marginBottom="scale800">
+    <LabelMedium 
+      marginBottom="scale500"
+      overrides={{
+        Block: {
+          style: {
+            fontSize: '14px',
+            fontWeight: 500,
+            color: 'contentSecondary',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }
+        }
+      }}
+    >
+      Medical History
+    </LabelMedium>
+    <Block
+      padding="scale600"
+      backgroundColor="mono100"
+      font="font400"
+      color="contentPrimary"
+      overrides={{
+        Block: {
+          style: {
+            borderRadius: '8px',
+            whiteSpace: 'pre-line'
+          }
+        }
+      }}
+    >
+      {getFormattedMedicalHistory(patient.medicalHistory)}
+    </Block>
+  </Block>
 
-              {patient.dialysisInfo && (
-                <Block marginTop="16px">
-                  <HeadingSmall marginTop="0" marginBottom="8px">
-                    Dialysis Information
-                  </HeadingSmall>
-                  <Block font="font400" marginBottom="4px">
-                    Type: {patient.dialysisInfo.dialysisType}
-                  </Block>
-                  <Block font="font400" marginBottom="4px">
-                    Frequency: {patient.dialysisInfo.frequency.replace('_', ' ')}
-                  </Block>
-                  <Block font="font400" marginBottom="4px">
-                    Access: {patient.dialysisInfo.accessType} ({patient.dialysisInfo.accessSite})
-                  </Block>
-                  <Block font="font400" marginBottom="4px">
-                    Dry Weight: {patient.dialysisInfo.dryWeight} kg
-                  </Block>
-                  <Block font="font400">
-                    Target UFR: {patient.dialysisInfo.targetUfr} ml/hr
-                  </Block>
-                </Block>
-              )}
+  {/* Dialysis Information Section */}
+  {patient.dialysisInfo && (
+    <Block>
+      <LabelMedium 
+        marginBottom="scale500"
+        overrides={{
+          Block: {
+            style: {
+              fontSize: '14px',
+              fontWeight: 500,
+              color: 'contentSecondary',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }
+          }
+        }}
+      >
+        Dialysis Information
+      </LabelMedium>
+      <Block
+        padding="scale600"
+        backgroundColor="mono100"
+        overrides={{
+          Block: {
+            style: {
+              borderRadius: '8px'
+            }
+          }
+        }}
+      >
+        {[
+          { label: 'Type', value: patient.dialysisInfo.dialysisType },
+          { label: 'Frequency', value: patient.dialysisInfo.frequency.replace('_', ' ') },
+          { label: 'Access', value: `${patient.dialysisInfo.accessType} (${patient.dialysisInfo.accessSite})` },
+          { label: 'Dry Weight', value: `${patient.dialysisInfo.dryWeight} kg` },
+          { label: 'Target UFR', value: `${patient.dialysisInfo.targetUfr} ml/hr` }
+        ].map((item, index) => (
+          <Block 
+            key={index}
+            display="flex"
+            justifyContent="space-between"
+            marginBottom="scale300"
+            alignItems="center"
+          >
+            <LabelSmall color="contentSecondary">{item.label}:</LabelSmall>
+            <Block font="font500" color="contentPrimary">
+              {item.value}
+            </Block>
+          </Block>
+        ))}
+      </Block>
+    </Block>
+  )}
+</Block>
 
-              <Block marginTop="24px">
+              <Block marginTop="scale1000">
                 <Button 
                   onClick={() => navigate('/nurse/patients')}
                   overrides={{
                     BaseButton: {
                       style: {
-                        width: '100%'
+                        width: '100%',
+                        paddingTop: '14px',
+                        paddingBottom: '14px',
+                        backgroundColor: '#276EF1',
+                          color: '#FFF',
+                          ':hover': {
+                            backgroundColor: '#1A54C8'
+                          },
+                          ':active': {
+                            backgroundColor: '#143FA6'
+                          }
                       }
                     }
                   }}
@@ -291,7 +451,7 @@ const NursePatientProfile: React.FC = () => {
         </Cell>
 
         <Cell span={[4, 8, 8]}>
-          <Card>
+          <Card overrides={{ Root: { style: { borderRadius: '12px' } } }}>
             <StyledBody>
               <Tabs
                 activeKey={activeKey}
@@ -309,219 +469,582 @@ const NursePatientProfile: React.FC = () => {
                   }
                 }}
                 activateOnFocus
+                overrides={{
+                  TabBorder: {
+                    style: {
+                      height: '3px'
+                    }
+                  }
+                }}
               >
                 <Tab title="Latest Dialysis Session">
-                  <Block padding="16px">
-                    <HeadingMedium marginTop="0">Latest Dialysis Session</HeadingMedium>
-                    
-                    {dialysisSessionsLoading ? (
-                      <Block display="flex" justifyContent="center" alignItems="center" height="200px">
-                        <Block>Loading dialysis sessions...</Block>
+  <Block padding="scale800">
+    <HeadingMedium marginTop="0" marginBottom="scale600">Latest Dialysis Session</HeadingMedium>
+    
+    {dialysisSessionsLoading ? (
+      <Block 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        height="200px"
+        color="contentSecondary"
+      >
+        <Block>Loading dialysis sessions...</Block>
+      </Block>
+    ) : dialysisSessionsError ? (
+      <Block 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        height="200px"
+        color="negative"
+      >
+        <Block>Error: {dialysisSessionsError}</Block>
+      </Block>
+    ) : dialysisSessions.length > 0 ? (
+      <Block>
+        {(() => {
+          const latestSession = dialysisSessions[dialysisSessions.length - 1];
+          return (
+            <Block
+              marginBottom="scale800"
+              padding="scale800"
+              backgroundColor="mono200"
+              overrides={{
+                Block: {
+                  style: {
+                    borderRadius: '8px',
+                    borderLeft: '4px solid #276EF1'
+                  }
+                }
+              }}
+            >
+              {/* Header Section */}
+              <Block 
+                display="flex" 
+                justifyContent="space-between" 
+                alignItems="center"
+                marginBottom="scale600"
+                flexDirection={['column', 'column', 'row']}
+              >
+                <HeadingSmall marginTop="0" marginBottom="0">
+                  Session on {new Date(latestSession.date).toLocaleDateString()}
+                </HeadingSmall>
+                <LabelSmall 
+                  overrides={{
+                    Block: {
+                      style: {
+                        backgroundColor: 'mono300',
+                        padding: '4px 8px',
+                        borderRadius: '4px'
+                      }
+                    }
+                  }}
+                >
+                  Session #{latestSession.sessionId}
+                </LabelSmall>
+              </Block>
+
+              {/* Data Grid */}
+              <Grid gridMargins={0} gridGutters={16}>
+                {latestSession.id && (
+                  <Cell span={[4, 4, 6]}>
+                    <Block marginBottom="scale600">
+                      <LabelMedium 
+                        marginBottom="scale300"
+                        overrides={{ Block: { style: { fontWeight: 600 } } }}
+                      >
+                        Session ID
+                      </LabelMedium>
+                      <Block font="font400">{latestSession.id}</Block>
+                    </Block>
+                  </Cell>
+                )}
+
+                {latestSession.status && (
+                  <Cell span={[4, 4, 6]}>
+                    <Block marginBottom="scale600">
+                      <LabelMedium 
+                        marginBottom="scale300"
+                        overrides={{ Block: { style: { fontWeight: 600 } } }}
+                      >
+                        Status
+                      </LabelMedium>
+                      <Block 
+                        font="font400"
+                        overrides={{
+                          Block: {
+                            style: {
+                              color: latestSession.status === 'COMPLETED' ? 'positive' : 'contentPrimary',
+                              fontWeight: 500
+                            }
+                          }
+                        }}
+                      >
+                        {latestSession.status}
                       </Block>
-                    ) : dialysisSessionsError ? (
-                      <Block display="flex" justifyContent="center" alignItems="center" height="200px">
-                        <Block color="negative">Error: {dialysisSessionsError}</Block>
+                    </Block>
+                  </Cell>
+                )}
+
+                {latestSession.doctor && (
+                  <Cell span={[4, 4, 6]}>
+                    <Block marginBottom="scale600">
+                      <LabelMedium 
+                        marginBottom="scale300"
+                        overrides={{ Block: { style: { fontWeight: 600 } } }}
+                      >
+                        Attending Doctor
+                      </LabelMedium>
+                      <Block font="font400">{latestSession.doctor.name}</Block>
+                    </Block>
+                  </Cell>
+                )}
+
+                {latestSession.nurse && (
+                  <Cell span={[4, 4, 6]}>
+                    <Block marginBottom="scale600">
+                      <LabelMedium 
+                        marginBottom="scale300"
+                        overrides={{ Block: { style: { fontWeight: 600 } } }}
+                      >
+                        Assigned Nurse
+                      </LabelMedium>
+                      <Block font="font400">{latestSession.nurse.name}</Block>
+                    </Block>
+                  </Cell>
+                )}
+
+                {latestSession.date && (
+                  <Cell span={[4, 4, 6]}>
+                    <Block marginBottom="scale600">
+                      <LabelMedium 
+                        marginBottom="scale300"
+                        overrides={{ Block: { style: { fontWeight: 600 } } }}
+                      >
+                        Date & Time
+                      </LabelMedium>
+                      <Block font="font400">{new Date(latestSession.date).toLocaleString()}</Block>
+                    </Block>
+                  </Cell>
+                )}
+
+                {latestSession.notes && (
+                  <Cell span={[4, 8, 12]}>
+                    <Block marginBottom="scale600">
+                      <LabelMedium 
+                        marginBottom="scale300"
+                        overrides={{ Block: { style: { fontWeight: 600 } } }}
+                      >
+                        Notes
+                      </LabelMedium>
+                      <Block 
+                        font="font400"
+                        padding="scale400"
+                        backgroundColor="mono100"
+                        overrides={{
+                          Block: {
+                            style: {
+                              borderRadius: '4px',
+                              whiteSpace: 'pre-wrap'
+                            }
+                          }
+                        }}
+                      >
+                        {latestSession.notes}
                       </Block>
-                    ) : dialysisSessions.length > 0 ? (
-                      <Block>
-                        {(() => {
-                          // Get the latest session (first item in the array since API returns newest first)
-                          const latestSession = dialysisSessions[0];
-                          return (
-                            <Block 
-                              marginBottom="16px"
-                              padding="16px"
-                              backgroundColor="rgba(0, 0, 0, 0.03)"
-                            >
-                              <Block display="flex" justifyContent="space-between" marginBottom="8px">
-                                <HeadingSmall marginTop="0" marginBottom="0">
-                                  Session on {new Date(latestSession.date).toLocaleDateString()}
-                                </HeadingSmall>
-                                <Block>
-                                  Session #{latestSession.sessionId}
-                                </Block>
-                              </Block>
-                          
-                              {latestSession.id && (
-                                <Block marginBottom="8px">
-                                  <strong>Session ID:</strong> {latestSession.id}
-                                </Block>
-                              )}
+                    </Block>
+                  </Cell>
+                )}
 
-                              {latestSession.status && (
-                                <Block marginBottom="8px">
-                                  <strong>Status:</strong> {latestSession.status}
-                                </Block>
-                              )}
+                {latestSession.createdAt && (
+                  <Cell span={[4, 4, 6]}>
+                    <Block marginBottom="scale600">
+                      <LabelMedium 
+                        marginBottom="scale300"
+                        overrides={{ Block: { style: { fontWeight: 600 } } }}
+                      >
+                        Record Created
+                      </LabelMedium>
+                      <Block font="font400">{new Date(latestSession.createdAt).toLocaleString()}</Block>
+                    </Block>
+                  </Cell>
+                )}
 
-                              {latestSession.doctor && (
-                                <Block marginBottom="8px">
-                                  <strong>Attending Doctor:</strong> {latestSession.doctor.name}
-                                </Block>
-                              )}
-
-                              {latestSession.nurse && (
-                                <Block marginBottom="8px">
-                                  <strong>Assigned Nurse:</strong> {latestSession.nurse.name}
-                                </Block>
-                              )}
-
-                              {latestSession.date && (
-                                <Block marginBottom="8px">
-                                  <strong>Date & Time:</strong> {new Date(latestSession.date).toLocaleString()}
-                                </Block>
-                              )}
-                          
-                              {latestSession.notes && (
-                                <Block marginBottom="8px">
-                                  <strong>Notes:</strong> {latestSession.notes}
-                                </Block>
-                              )}
-
-                              {latestSession.createdAt && (
-                                <Block marginBottom="8px">
-                                  <strong>Record Created:</strong> {new Date(latestSession.createdAt).toLocaleString()}
-                                </Block>
-                              )}
-
-                              {latestSession.updatedAt && latestSession.updatedAt !== latestSession.createdAt && (
-                                <Block marginBottom="8px">
-                                  <strong>Last Updated:</strong> {new Date(latestSession.updatedAt).toLocaleString()}
-                                </Block>
-                              )}
-                            </Block>
-                          );
-                        })()}
-                      </Block>
-                    ) : (
-                      <Block padding="16px" backgroundColor="rgba(0, 0, 0, 0.03)">
-                        <Block display="flex" justifyContent="center" color="contentTertiary">
-                          No dialysis sessions recorded for this patient.
-                        </Block>
-                      </Block>
-                    )}
-                  </Block>
-                </Tab>
+                {latestSession.updatedAt && latestSession.updatedAt !== latestSession.createdAt && (
+                  <Cell span={[4, 4, 6]}>
+                    <Block marginBottom="scale600">
+                      <LabelMedium 
+                        marginBottom="scale300"
+                        overrides={{ Block: { style: { fontWeight: 600 } } }}
+                      >
+                        Last Updated
+                      </LabelMedium>
+                      <Block font="font400">{new Date(latestSession.updatedAt).toLocaleString()}</Block>
+                    </Block>
+                  </Cell>
+                )}
+              </Grid>
+            </Block>
+          );
+        })()}
+      </Block>
+    ) : (
+      <Block
+        padding="scale800"
+        backgroundColor="mono200"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        overrides={{
+          Block: {
+            style: {
+              borderRadius: '8px',
+              minHeight: '200px'
+            }
+          }
+        }}
+      >
+        <Block color="contentTertiary">
+          No dialysis sessions recorded for this patient.
+        </Block>
+      </Block>
+    )}
+  </Block>
+</Tab>
                 
                 <Tab title="Monthly Investigation">
-                  <Block padding="16px">
-                    <HeadingMedium marginTop="0">Latest Monthly Investigation</HeadingMedium>
-                    
-                    {monthlyInvestigationsLoading ? (
-                      <Block display="flex" justifyContent="center" alignItems="center" height="200px">
-                        <Block>Loading monthly investigations...</Block>
+  <Block padding="scale800">
+    <HeadingMedium marginTop="0" marginBottom="scale600">Latest Monthly Investigation</HeadingMedium>
+    
+    {monthlyInvestigationsLoading ? (
+      <Block 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        height="200px"
+        color="contentSecondary"
+      >
+        <Block>Loading monthly investigations...</Block>
+      </Block>
+    ) : monthlyInvestigationsError ? (
+      <Block 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        height="200px"
+        color="negative"
+      >
+        <Block>Error: {monthlyInvestigationsError}</Block>
+      </Block>
+    ) : monthlyInvestigations.length > 0 ? (
+      <Block>
+        {(() => {
+          const latestInvestigation = monthlyInvestigations[0];
+          return (
+            <Block
+              marginBottom="scale800"
+              padding="scale800"
+              backgroundColor="mono200"
+              overrides={{
+                Block: {
+                  style: {
+                    borderRadius: '8px',
+                    borderLeft: '4px solid #276EF1'
+                  }
+                }
+              }}
+            >
+              {/* Header Section */}
+              <Block 
+                display="flex" 
+                justifyContent="space-between" 
+                alignItems="center"
+                marginBottom="scale600"
+                flexDirection={['column', 'column', 'row']}
+              >
+                <HeadingSmall marginTop="0" marginBottom="0">
+                  Investigation on {new Date(latestInvestigation.date).toLocaleDateString()}
+                </HeadingSmall>
+                <LabelSmall 
+                  overrides={{
+                    Block: {
+                      style: {
+                        backgroundColor: 'mono300',
+                        padding: '4px 8px',
+                        borderRadius: '4px'
+                      }
+                    }
+                  }}
+                >
+                  ID: {latestInvestigation.investigationId}
+                </LabelSmall>
+              </Block>
+
+              {/* Data Grid */}
+              <Grid gridMargins={0} gridGutters={16}>
+                {/* Renal Function */}
+                <Cell span={[4, 8, 12]}>
+                  <Block marginBottom="scale600">
+                    <LabelMedium 
+                      marginBottom="scale300"
+                      overrides={{ Block: { style: { fontWeight: 600 } } }}
+                    >
+                      Renal Function
+                    </LabelMedium>
+                    <Block display="flex" flexWrap font="font400">
+                      <Block width="50%" marginBottom="scale300">
+                        <Block font="font300" color="contentSecondary">Creatinine Pre-HD:</Block>
+                        {latestInvestigation.scrPreHD?.toFixed(2) || 'N/A'} mg/dL
                       </Block>
-                    ) : monthlyInvestigationsError ? (
-                      <Block display="flex" justifyContent="center" alignItems="center" height="200px">
-                        <Block color="negative">Error: {monthlyInvestigationsError}</Block>
+                      <Block width="50%" marginBottom="scale300">
+                        <Block font="font300" color="contentSecondary">Creatinine Post-HD:</Block>
+                        {latestInvestigation.scrPostHD?.toFixed(2) || 'N/A'} mg/dL
                       </Block>
-                    ) : monthlyInvestigations.length > 0 ? (
-                      <Block>
-                        {(() => {
-                          // Get the latest investigation (first item in the array since API returns newest first)
-                          const latestInvestigation = monthlyInvestigations[0];
-                          return (
-                            <Block 
-                              marginBottom="16px"
-                              padding="16px"
-                              backgroundColor="rgba(0, 0, 0, 0.03)"
-                            >
-                              <Block display="flex" justifyContent="space-between" marginBottom="8px">
-                                <HeadingSmall marginTop="0" marginBottom="0">
-                                  Investigation on {new Date(latestInvestigation.date).toLocaleDateString()}
-                                </HeadingSmall>
-                                <Block>ID: {latestInvestigation.investigationId}</Block>
-                              </Block>
-                              
-                              <Block marginBottom="8px">
-                                <strong>Renal Function:</strong> 
-                                Creatinine Pre-HD: {latestInvestigation.scrPreHD?.toFixed(2)} mg/dL, 
-                                Creatinine Post-HD: {latestInvestigation.scrPostHD?.toFixed(2)} mg/dL, 
-                                BUN: {latestInvestigation.bu?.toFixed(2)} mg/dL
-                              </Block>
-                              
-                              <Block marginBottom="8px">
-                                <strong>CBC:</strong> 
-                                Hemoglobin: {latestInvestigation.hb?.toFixed(2)} g/dL
-                              </Block>
-                              
-                              <Block marginBottom="8px">
-                                <strong>Electrolytes:</strong> 
-                                Sodium Pre-HD: {latestInvestigation.serumNaPreHD?.toFixed(2)} mEq/L, 
-                                Sodium Post-HD: {latestInvestigation.serumNaPostHD?.toFixed(2)} mEq/L, 
-                                Potassium Pre-HD: {latestInvestigation.serumKPreHD?.toFixed(2)} mEq/L, 
-                                Potassium Post-HD: {latestInvestigation.serumKPostHD?.toFixed(2)} mEq/L
-                              </Block>
-                              
-                              <Block marginBottom="8px">
-                                <strong>Bone & Mineral:</strong> 
-                                Calcium: {latestInvestigation.sCa?.toFixed(2)} mg/dL, 
-                                Phosphorus: {latestInvestigation.sPhosphate?.toFixed(2)} mg/dL, 
-                                PTH: {latestInvestigation.pth?.toFixed(2)} pg/mL, 
-                                Vitamin D: {latestInvestigation.vitD?.toFixed(2)} ng/mL
-                              </Block>
-                              
-                              <Block marginBottom="8px">
-                                <strong>Protein & Nutrition:</strong> 
-                                Albumin: {latestInvestigation.albumin?.toFixed(2)} g/dL, 
-                                Uric Acid: {latestInvestigation.ua?.toFixed(2)} mg/dL
-                              </Block>
-                              
-                              <Block marginBottom="8px">
-                                <strong>Iron Studies:</strong> 
-                                Serum Iron: {latestInvestigation.serumIron?.toFixed(2)} μg/dL, 
-                                Serum Ferritin: {latestInvestigation.serumFerritin?.toFixed(2)} ng/mL
-                              </Block>
-                              
-                              <Block marginBottom="8px">
-                                <strong>Other:</strong> 
-                                HbA1C: {latestInvestigation.hbA1C?.toFixed(2)}%, 
-                                Bicarbonate: {latestInvestigation.hco?.toFixed(2)} mEq/L, 
-                                Alkaline Phosphatase: {latestInvestigation.al?.toFixed(2)} U/L
-                              </Block>
-                              
-                              <Block marginBottom="8px">
-                                <strong>Laboratory Info:</strong>
-                                <Block marginLeft="16px" marginTop="4px">
-                                  Requested by: {latestInvestigation.laboratoryInfo?.requestedBy?.name || 'N/A'}
-                                </Block>
-                                <Block marginLeft="16px">
-                                  Performed by: {latestInvestigation.laboratoryInfo?.performedBy?.name || 'N/A'}
-                                </Block>
-                                <Block marginLeft="16px">
-                                  Reported by: {latestInvestigation.laboratoryInfo?.reportedBy?.name || 'N/A'}
-                                </Block>
-                                <Block marginLeft="16px">
-                                  Testing Method: {latestInvestigation.laboratoryInfo?.testingMethod || 'N/A'}
-                                </Block>
-                              </Block>
-                              
-                              <Block marginBottom="8px">
-                                <strong>Status:</strong> {latestInvestigation.status}
-                              </Block>
-                              
-                              {latestInvestigation.notes && (
-                                <Block marginBottom="8px">
-                                  <strong>Notes:</strong> {latestInvestigation.notes}
-                                </Block>
-                                )}
-                              
-                              <Block marginTop="16px" font="font300">
-                                Total investigations available: {monthlyInvestigations.length}
-                              </Block>
-                            </Block>
-                          );
-                        })()}
+                      <Block width="50%">
+                        <Block font="font300" color="contentSecondary">BUN:</Block>
+                        {latestInvestigation.bu?.toFixed(2) || 'N/A'} mg/dL
                       </Block>
-                    ) : (
-                      <Block padding="16px" backgroundColor="rgba(0, 0, 0, 0.03)">
-                        <Block display="flex" justifyContent="center" color="contentTertiary">
-                          No monthly investigations recorded for this patient.
-                        </Block>
-                      </Block>
-                    )}
+                    </Block>
                   </Block>
-                </Tab>
+                </Cell>
+
+                {/* CBC */}
+                <Cell span={[4, 4, 4]}>
+                  <Block marginBottom="scale600">
+                    <LabelMedium 
+                      marginBottom="scale300"
+                      overrides={{ Block: { style: { fontWeight: 600 } } }}
+                    >
+                      CBC
+                    </LabelMedium>
+                    <Block font="font400">
+                      <Block font="font300" color="contentSecondary">Hemoglobin:</Block>
+                      {latestInvestigation.hb?.toFixed(2) || 'N/A'} g/dL
+                    </Block>
+                  </Block>
+                </Cell>
+
+                {/* Electrolytes */}
+                <Cell span={[4, 8, 8]}>
+                  <Block marginBottom="scale600">
+                    <LabelMedium 
+                      marginBottom="scale300"
+                      overrides={{ Block: { style: { fontWeight: 600 } } }}
+                    >
+                      Electrolytes
+                    </LabelMedium>
+                    <Block display="flex" flexWrap font="font400">
+                      <Block width="50%" marginBottom="scale300">
+                        <Block font="font300" color="contentSecondary">Sodium Pre-HD:</Block>
+                        {latestInvestigation.serumNaPreHD?.toFixed(2) || 'N/A'} mEq/L
+                      </Block>
+                      <Block width="50%" marginBottom="scale300">
+                        <Block font="font300" color="contentSecondary">Sodium Post-HD:</Block>
+                        {latestInvestigation.serumNaPostHD?.toFixed(2) || 'N/A'} mEq/L
+                      </Block>
+                      <Block width="50%">
+                        <Block font="font300" color="contentSecondary">Potassium Pre-HD:</Block>
+                        {latestInvestigation.serumKPreHD?.toFixed(2) || 'N/A'} mEq/L
+                      </Block>
+                      <Block width="50%">
+                        <Block font="font300" color="contentSecondary">Potassium Post-HD:</Block>
+                        {latestInvestigation.serumKPostHD?.toFixed(2) || 'N/A'} mEq/L
+                      </Block>
+                    </Block>
+                  </Block>
+                </Cell>
+
+                {/* Bone & Mineral */}
+                <Cell span={[4, 8, 8]}>
+                  <Block marginBottom="scale600">
+                    <LabelMedium 
+                      marginBottom="scale300"
+                      overrides={{ Block: { style: { fontWeight: 600 } } }}
+                    >
+                      Bone & Mineral
+                    </LabelMedium>
+                    <Block display="flex" flexWrap font="font400">
+                      <Block width="50%" marginBottom="scale300">
+                        <Block font="font300" color="contentSecondary">Calcium:</Block>
+                        {latestInvestigation.sCa?.toFixed(2) || 'N/A'} mg/dL
+                      </Block>
+                      <Block width="50%" marginBottom="scale300">
+                        <Block font="font300" color="contentSecondary">Phosphorus:</Block>
+                        {latestInvestigation.sPhosphate?.toFixed(2) || 'N/A'} mg/dL
+                      </Block>
+                      <Block width="50%">
+                        <Block font="font300" color="contentSecondary">PTH:</Block>
+                        {latestInvestigation.pth?.toFixed(2) || 'N/A'} pg/mL
+                      </Block>
+                      <Block width="50%">
+                        <Block font="font300" color="contentSecondary">Vitamin D:</Block>
+                        {latestInvestigation.vitD?.toFixed(2) || 'N/A'} ng/mL
+                      </Block>
+                    </Block>
+                  </Block>
+                </Cell>
+
+                {/* Protein & Nutrition */}
+                <Cell span={[4, 4, 6]}>
+                  <Block marginBottom="scale600">
+                    <LabelMedium 
+                      marginBottom="scale300"
+                      overrides={{ Block: { style: { fontWeight: 600 } } }}
+                    >
+                      Protein & Nutrition
+                    </LabelMedium>
+                    <Block display="flex" flexWrap font="font400">
+                      <Block width="100%" marginBottom="scale300">
+                        <Block font="font300" color="contentSecondary">Albumin:</Block>
+                        {latestInvestigation.albumin?.toFixed(2) || 'N/A'} g/dL
+                      </Block>
+                      <Block width="100%">
+                        <Block font="font300" color="contentSecondary">Uric Acid:</Block>
+                        {latestInvestigation.ua?.toFixed(2) || 'N/A'} mg/dL
+                      </Block>
+                    </Block>
+                  </Block>
+                </Cell>
+
+                {/* Iron Studies */}
+                <Cell span={[4, 4, 6]}>
+                  <Block marginBottom="scale600">
+                    <LabelMedium 
+                      marginBottom="scale300"
+                      overrides={{ Block: { style: { fontWeight: 600 } } }}
+                    >
+                      Iron Studies
+                    </LabelMedium>
+                    <Block display="flex" flexWrap={true} font="font400">
+                      <Block width="100%" marginBottom="scale300">
+                        <Block font="font300" color="contentSecondary">Serum Iron:</Block>
+                        {latestInvestigation.serumIron?.toFixed(2) || 'N/A'} μg/dL
+                      </Block>
+                      <Block width="100%">
+                        <Block font="font300" color="contentSecondary">Serum Ferritin:</Block>
+                        {latestInvestigation.serumFerritin?.toFixed(2) || 'N/A'} ng/mL
+                      </Block>
+                    </Block>
+                  </Block>
+                </Cell>
+
+                {/* Other */}
+                <Cell span={[4, 8, 8]}>
+                  <Block marginBottom="scale600">
+                    <LabelMedium 
+                      marginBottom="scale300"
+                      overrides={{ Block: { style: { fontWeight: 600 } } }}
+                    >
+                      Other
+                    </LabelMedium>
+                    <Block display="flex" flexWrap={true} font="font400">
+                      <Block width="50%" marginBottom="scale300">
+                        <Block font="font300" color="contentSecondary">HbA1C:</Block>
+                        {latestInvestigation.hbA1C?.toFixed(2) || 'N/A'}%
+                      </Block>
+                      <Block width="50%" marginBottom="scale300">
+                        <Block font="font300" color="contentSecondary">Bicarbonate:</Block>
+                        {latestInvestigation.hco?.toFixed(2) || 'N/A'} mEq/L
+                      </Block>
+                      <Block width="50%">
+                        <Block font="font300" color="contentSecondary">Alkaline Phosphatase:</Block>
+                        {latestInvestigation.al?.toFixed(2) || 'N/A'} U/L
+                      </Block>
+                    </Block>
+                  </Block>
+                </Cell>
+
+                {/* Laboratory Info */}
+                <Cell span={[4, 8, 12]}>
+                  <Block marginBottom="scale600">
+                    <LabelMedium 
+                      marginBottom="scale300"
+                      overrides={{ Block: { style: { fontWeight: 600 } } }}
+                    >
+                      Laboratory Info
+                    </LabelMedium>
+                    <Block font="font400">
+                      <Block display="flex" marginBottom="scale300">
+                        <Block width="150px" font="font300" color="contentSecondary">Requested by:</Block>
+                        <Block>{latestInvestigation.laboratoryInfo?.requestedBy?.name || 'N/A'}</Block>
+                      </Block>
+                      <Block display="flex" marginBottom="scale300">
+                        <Block width="150px" font="font300" color="contentSecondary">Performed by:</Block>
+                        <Block>{latestInvestigation.laboratoryInfo?.performedBy?.name || 'N/A'}</Block>
+                      </Block>
+                      <Block display="flex" marginBottom="scale300">
+                        <Block width="150px" font="font300" color="contentSecondary">Reported by:</Block>
+                        <Block>{latestInvestigation.laboratoryInfo?.reportedBy?.name || 'N/A'}</Block>
+                      </Block>
+                      <Block display="flex">
+                        <Block width="150px" font="font300" color="contentSecondary">Testing Method:</Block>
+                        <Block>{latestInvestigation.laboratoryInfo?.testingMethod || 'N/A'}</Block>
+                      </Block>
+                    </Block>
+                  </Block>
+                </Cell>
+
+                {/* Status */}
+                <Cell span={[4, 4, 4]}>
+                  <Block marginBottom="scale600">
+                    <LabelMedium 
+                      marginBottom="scale300"
+                      overrides={{ Block: { style: { fontWeight: 600 } } }}
+                    >
+                      Status
+                    </LabelMedium>
+                    <Block 
+                      font="font400"
+                      overrides={{
+                        Block: {
+                          style: {
+                            color: latestInvestigation.status === 'COMPLETED' ? 'positive' : 'contentPrimary',
+                            fontWeight: 500
+                          }
+                        }
+                      }}
+                    >
+                      {latestInvestigation.status}
+                    </Block>
+                  </Block>
+                </Cell>
+              </Grid>
+
+              <Block 
+                marginTop="scale600" 
+                font="font300"
+                color="contentSecondary"
+              >
+                Total investigations available: {monthlyInvestigations.length}
+              </Block>
+            </Block>
+          );
+        })()}
+      </Block>
+    ) : (
+      <Block
+        padding="scale800"
+        backgroundColor="mono200"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        overrides={{
+          Block: {
+            style: {
+              borderRadius: '8px',
+              minHeight: '200px'
+            }
+          }
+        }}
+      >
+        <Block color="contentTertiary">
+          No monthly investigations recorded for this patient.
+        </Block>
+      </Block>
+    )}
+  </Block>
+</Tab>
               </Tabs>
             </StyledBody>
           </Card>

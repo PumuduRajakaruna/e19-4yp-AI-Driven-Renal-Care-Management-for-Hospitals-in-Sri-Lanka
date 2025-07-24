@@ -136,7 +136,21 @@ const AdminDashboard: React.FC = () => {
               </Block>
 
               <Block display="flex" justifyContent="center" marginTop="16px">
-                <Button onClick={() => navigate('/admin/user-management')}>
+                <Button onClick={() => navigate('/admin/user-management')}
+                  overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>
                   Manage Users
                 </Button>
               </Block>
@@ -217,7 +231,21 @@ const AdminDashboard: React.FC = () => {
               )}
 
               <Block display="flex" justifyContent="center" marginTop="16px">
-                <Button onClick={() => navigate('/admin/notifications')}>
+                <Button onClick={() => navigate('/admin/notifications')}
+                  overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>
                   View All Notifications
                 </Button>
               </Block>

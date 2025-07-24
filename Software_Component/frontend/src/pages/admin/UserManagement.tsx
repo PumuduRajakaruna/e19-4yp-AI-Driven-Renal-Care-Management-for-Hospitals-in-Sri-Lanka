@@ -197,7 +197,21 @@ const AdminUserManagement: React.FC = () => {
                 <HeadingMedium marginTop="0" marginBottom="0">
                   All Users
                 </HeadingMedium>
-                <Button onClick={() => setIsAddModalOpen(true)}>Add New User</Button>
+                <Button onClick={() => setIsAddModalOpen(true)}
+                  overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>Add New User</Button>
               </Block>
 
               <Table
@@ -301,7 +315,21 @@ const AdminUserManagement: React.FC = () => {
           <ModalButton kind="tertiary" onClick={closeAddUserModal}>
             Cancel
           </ModalButton>
-          <ModalButton onClick={handleAddUser}>Add User</ModalButton>
+          <ModalButton onClick={handleAddUser}
+          overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>Add User</ModalButton>
         </ModalFooter>
       </Modal>
 
@@ -349,7 +377,21 @@ const AdminUserManagement: React.FC = () => {
             <ModalButton kind="tertiary" onClick={() => setIsEditModalOpen(false)}>
               Cancel
             </ModalButton>
-            <ModalButton onClick={handleEditUser}>Save Changes</ModalButton>
+            <ModalButton onClick={handleEditUser}
+            overrides={{
+      BaseButton: {
+          style: {
+            backgroundColor: '#276EF1',
+            color: '#FFF',
+            ':hover': {
+              backgroundColor: '#276EF1'
+            },
+            ':active': {
+              backgroundColor: '#276EF1'
+            }
+          }
+        }
+    }}>Save Changes</ModalButton>
           </ModalFooter>
         </Modal>
       )}
